@@ -45,12 +45,12 @@
       <menus>
         <Menu mnemonicParsing="false" text="选项">
           <items>
-            <MenuItem mnemonicParsing="false" text="系统设置" />
+            <MenuItem mnemonicParsing="false" fx:id="setting" text="系统设置" onAction="#onSetting"/>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
-            <MenuItem mnemonicParsing="false" text="关于" />
+            <MenuItem mnemonicParsing="false" fx:id="about" text="关于" onAction="#onAbout"/>
           </items>
         </Menu>
       </menus>

@@ -12,44 +12,47 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17">
-  <columnConstraints>
-      <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
-    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
-    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="230.0" />
-      <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
-  </columnConstraints>
-  <rowConstraints>
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-      <RowConstraints fillHeight="false" minHeight="10.0" valignment="BOTTOM" vgrow="ALWAYS" />
-  </rowConstraints>
-   <children>
-      <Label text="数据库连接账号" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-      <Label text="数据连接密码" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-      <Label text="默认作者" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-      <TextField GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <TextField GridPane.columnIndex="2" GridPane.rowIndex="4" />
-      <PasswordField GridPane.columnIndex="2" GridPane.rowIndex="3" />
-      <Label text="数据库驱动" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <Label text="数据库连接地址" GridPane.columnIndex="1" />
-      <TextField GridPane.columnIndex="2" />
-      <AnchorPane GridPane.columnIndex="2" GridPane.rowIndex="1">
-         <children>
-            <ComboBox prefHeight="30.0" prefWidth="230.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-      <ButtonBar GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER">
-        <buttons>
-          <Button mnemonicParsing="false" text="保存" />
-            <Button mnemonicParsing="false" text="取消" />
-        </buttons>
-         <GridPane.margin>
-            <Insets bottom="10.0" />
-         </GridPane.margin>
-      </ButtonBar>
-   </children>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
+          fx:controller="com.karys.jtools.controller.SettingController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="NEVER" minWidth="10.0"/>
+        <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0"/>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="230.0"/>
+        <ColumnConstraints hgrow="NEVER" minWidth="10.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+        <RowConstraints fillHeight="false" minHeight="10.0" valignment="BOTTOM" vgrow="ALWAYS"/>
+    </rowConstraints>
+    <children>
+        <Label text="数据库连接账号" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Label text="数据连接密码" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Label text="默认作者" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <TextField GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+        <TextField GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+        <PasswordField GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+        <Label text="数据库驱动" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="数据库连接地址" GridPane.columnIndex="1"/>
+        <TextField GridPane.columnIndex="2"/>
+        <AnchorPane GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <children>
+                <ComboBox prefHeight="30.0" prefWidth="230.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fx:id="driverComboBox"/>
+            </children>
+        </AnchorPane>
+        <ButtonBar GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.valignment="BOTTOM"
+                   GridPane.vgrow="NEVER">
+            <buttons>
+                <Button mnemonicParsing="false" text="保存" onAction="#save"/>
+                <Button mnemonicParsing="false" text="取消" onAction="#cancel"/>
+            </buttons>
+            <GridPane.margin>
+                <Insets bottom="10.0"/>
+            </GridPane.margin>
+        </ButtonBar>
+    </children>
 </GridPane>
