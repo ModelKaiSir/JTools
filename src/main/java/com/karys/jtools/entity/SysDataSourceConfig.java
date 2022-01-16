@@ -2,11 +2,15 @@ package com.karys.jtools.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 数据库配置
  */
 @Data
-public class SysDataSourceConfig {
+public class SysDataSourceConfig implements Serializable {
+
+    public static final long serialVersionUID = 1L;
 
     private String dataBaseUrl;
     private String driverName;
@@ -17,7 +21,7 @@ public class SysDataSourceConfig {
      *
      * 生成代码目录根路径
      */
-    private String toCodePath;
+    private String rootPath;
 
     /**
      *

@@ -2,6 +2,7 @@ package com.karys.jtools.menu;
 
 import com.karys.jtools.entity.GenerateConfig;
 import com.karys.jtools.enums.CodeGenerateEnum;
+import com.karys.jtools.service.SysDataBaseConfigService;
 import com.karys.jtools.views.CodeGenerateView;
 import com.karys.jtools.views.WidgetMenuView;
 import javafx.beans.property.Property;
@@ -12,6 +13,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,6 +28,9 @@ public abstract class AbstractCodeGenerateMenu implements Menu, InitializingBean
     @Resource
     private CodeGenerateView codeGenerateView;
 
+    @Resource
+    private SysDataBaseConfigService sysDataBaseConfigService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         menuView.getPresenter().titleProperty().bindBidirectional(nameProperty());
@@ -37,8 +42,15 @@ public abstract class AbstractCodeGenerateMenu implements Menu, InitializingBean
     protected ObservableValue<? extends EventHandler<ActionEvent>> onActionProperty(){
 
         return new SimpleObjectProperty<>(e -> {
-            codeGenerateView.getPresenter().generateTypeProperty().bind(new SimpleObjectProperty<>(getGenerateType()));
-            codeGenerateView.showView(Modality.APPLICATION_MODAL);
+
+            if(null != sysDataBaseConfigService.getSysDataBaseConfig()){
+
+                codeGenerateView.getPresenter().generateTypeProperty().bind(new SimpleObjectProperty<>(getGenerateType()));
+                codeGenerateView.showView(Modality.APPLICATION_MODAL);
+            }else{
+
+                new Alert(Alert.AlertType.WARNING, "请先进行全局配置").showAndWait();
+            }
         });
     }
 
