@@ -10,7 +10,11 @@ public interface SysDataBaseConfigService {
 
     SysDataSourceConfig getSysDataBaseConfig();
 
+    boolean getConfigFlag();
+
     void setSysDataBaseConfig(SysDataSourceConfig config);
+
+    void setConfigFlag(Integer i);
 
     ObservableValue<? extends ObservableList<String>> driverListProperty();
 

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -32,18 +33,16 @@ public class SysDataBaseConfigServiceImpl implements SysDataBaseConfigService {
     @Resource
     private AppConfig appConfig;
 
-    ObservableList<String> driverList;
+    public static final ObservableList<String> driverList = FXCollections.observableArrayList();
+
+    static {
+        driverList.add("com.mysql.cj.jdbc.Driver");
+        driverList.add("com.mysql.cj.jdbc.Driver2");
+    }
 
     @PostConstruct
     public void start() {
 
-        IndexTreeList<String> dl = mapDb.indexTreeList(MapDbConstant.DRIVER_LIST, Serializer.STRING).createOrOpen();
-
-        if (dl.isEmpty()) {
-            dl.add("com.mysql.cj.jdbc.Driver");
-        }
-
-        driverList = FXCollections.observableArrayList(dl);
     }
 
     @Override
@@ -58,11 +57,29 @@ public class SysDataBaseConfigServiceImpl implements SysDataBaseConfigService {
         return new SysDataSourceConfig();
     }
 
+    @Override
+    public boolean getConfigFlag() {
+        Atomic.Var var = (Atomic.Var) mapDb.atomicVar(MapDbConstant.SYS_DATA_SOURCE_CONFIG_FLAG, Serializer.JAVA).createOrOpen();
+
+        if (null != var) {
+            return Objects.equals(var.get(), 1);
+        }
+
+        return false;
+    }
+
     @Transactional
     @Override
     public void setSysDataBaseConfig(SysDataSourceConfig config) {
         Atomic.Var var = (Atomic.Var) mapDb.atomicVar(MapDbConstant.SYS_DATA_SOURCE_CONFIG, Serializer.JAVA).createOrOpen();
         var.set(config);
+        setConfigFlag(1);
+    }
+
+    @Override
+    public void setConfigFlag(Integer flag) {
+        Atomic.Var var = (Atomic.Var) mapDb.atomicVar(MapDbConstant.SYS_DATA_SOURCE_CONFIG_FLAG, Serializer.JAVA).createOrOpen();
+        var.set(flag);
     }
 
     @Override

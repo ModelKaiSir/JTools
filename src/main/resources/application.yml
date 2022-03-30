@@ -1,11 +1,24 @@
-jTools:
+jtools:
   config:
     project:
       items:
-        - '1'
-        - '2'
-        - '3'
-        - '4'
+        - 'hrms-system'
+        - 'hrms-pm'
+        - 'hrms-sign'
+        - 'hrms-salary'
       packages:
-        - '5'
-        - '6'
+        - 'com.ngu.hrms.system'
+        - 'com.ngu.hrms.pm'
+        - 'com.ngu.hrms.sign'
+        - 'com.ngu.hrms.salary'
+javafx:
+  title: JavaFx & SpringBoot
+  appicons: /icons/icon.png
+  stage:
+    width: 1200
+    height: 800 # style: DECORATED # javafx.stage.StageStyle [DECORATED, UNDECORATED, TRANSPARENT, UTILITY, UNIFIED] # resizable: false
+spring:
+  application:
+    name: JTools
+app:
+  name: JTools

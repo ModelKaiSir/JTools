@@ -1,103 +1,150 @@
 package com.karys.jtools.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.Group;
-import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.karys.jtools.core.JavaCodeTemplateGenerateManager;
+import com.karys.jtools.core.notify.MessageNotification;
 import com.karys.jtools.entity.GenerateConfig;
 import com.karys.jtools.enums.CodeGenerateEnum;
 import com.karys.jtools.mapstruct.GenerateConfigMapper;
-import com.karys.jtools.mapstruct.SysDataBaseConfigMapper;
 import com.karys.jtools.service.SysDataBaseConfigService;
-import com.sun.javafx.scene.SceneHelper;
+import com.karys.jtools.utils.TaskUtil;
+import com.karys.jtools.utils.ValidateUtil;
+import com.karys.jtools.views.CodeGenerateView;
 import de.felixroske.jfxsupport.AbstractFxmlController;
-import de.felixroske.jfxsupport.FXMLController;
-import javafx.beans.property.*;
+import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.materialfx.controls.legacy.MFXLegacyComboBox;
+import io.github.palexdev.materialfx.enums.NotificationPos;
+import io.github.palexdev.materialfx.notifications.MFXNotificationCenterSystem;
+import io.github.palexdev.materialfx.notifications.MFXNotificationSystem;
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 import lombok.Data;
+import lombok.SneakyThrows;
+import net.synedra.validatorfx.Validator;
 
-import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
-@FXMLController
 public class CodeGenerateController extends AbstractFxmlController implements Initializable {
 
     @FXML
-    public Button generate;
+    public MFXButton action;
 
     @FXML
-    public Button cancel;
+    private Text title;
 
-    @Resource
+    @FXML
+    private MFXLegacyComboBox<String> projectComboBox;
+
+    @FXML
+    private MFXLegacyComboBox<String> packageComboBox;
+
+    @FXML
+    private MFXTextField author;
+
+    @FXML
+    private MFXTextField tableNames;
+
     private SysDataBaseConfigService sysDataBaseConfigService;
 
-    @Resource
     private JavaCodeTemplateGenerateManager codeTemplateGenerateManager;
 
     private ObjectProperty<CodeGenerateEnum> generateType = new SimpleObjectProperty<>();
 
-    @FXML
-    private VBox container;
-
-    @FXML
-    private Pane formContainer;
-
     private GenerateFormProperty formProperty = new GenerateFormProperty();
 
-    private Form generateForm;
+    private Validator validator = new Validator();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        sysDataBaseConfigService = getBean(SysDataBaseConfigService.class);
+        codeTemplateGenerateManager = getBean(JavaCodeTemplateGenerateManager.class);
+        generateFormNode();
 
-        ListProperty<String> projectList = new SimpleListProperty<>(FXCollections.observableArrayList(sysDataBaseConfigService.getProjectList()));
-        ListProperty<String> packageList = new SimpleListProperty<>(FXCollections.observableArrayList(sysDataBaseConfigService.getObjectPackageList()));
+        validator.createCheck().dependsOn("project", this.projectComboBox.valueProperty()).withMethod(c -> ValidateUtil.notNull(c.get("project"), c)).decorates(this.projectComboBox).immediate();
+        validator
+                .createCheck()
+                .dependsOn("packagePath", this.packageComboBox.valueProperty())
+                .withMethod(c -> ValidateUtil.notNull(c.get("packagePath"), c))
+                .decorates(this.packageComboBox)
+                .immediate();
+        validator.createCheck().dependsOn("tableNames", this.tableNames.textProperty()).withMethod(c -> ValidateUtil.notNull(c.get("tableNames"), c)).decorates(this.tableNames).immediate();
+    }
 
-        // add Form
-        generateForm = Form.of(Group.of(Field.ofSingleSelectionType(projectList, formProperty.project).label("项目").required("请选择项目"),
-                Field.ofSingleSelectionType(packageList, formProperty.packagePath).label("包名").required("请选择包路径"),
-                Field.ofStringType(formProperty.tableNames).label("表名").required("表名不能为空").tooltip("多个用逗号分割"),
-                Field.ofStringType(formProperty.author).label("作者")
-        )).title("generate");
+    private void generateFormNode() {
 
+        // data bind
+        projectComboBox.setItems(FXCollections.observableArrayList(sysDataBaseConfigService.getProjectList()));
+        packageComboBox.setItems(FXCollections.observableArrayList(sysDataBaseConfigService.getObjectPackageList()));
 
-        formContainer.getChildren().add(new FormRenderer(generateForm));
+        formProperty.project.bind(projectComboBox.valueProperty());
+        formProperty.packagePath.bind(packageComboBox.valueProperty());
+        formProperty.author.bind(author.textProperty());
+        formProperty.tableNames.bind(tableNames.textProperty());
     }
 
     public ObjectProperty<CodeGenerateEnum> generateTypeProperty() {
         return generateType;
     }
 
-    @FXML
-    public void onGenerateAction(ActionEvent event) {
-
-        if (generateForm.validProperty().get()) {
-
-            generateForm.persist();
-            GenerateConfig config = GenerateConfigMapper.INSTANCE.generateToEntity(formProperty);
-            codeTemplateGenerateManager.generate(sysDataBaseConfigService.getSysDataBaseConfig(), config);
-        }
+    public StringProperty titleProperty() {
+        return title.textProperty();
     }
 
     @FXML
-    public void cancel(ActionEvent event) {
-        // close
-        ((Stage) container.getScene().getWindow()).close();
+    public void onGenerateAction(ActionEvent event) {
+
+        if (getBean(SettingController.class).isUnReady()) {
+            MessageNotification message = new MessageNotification();
+            message.setTitleText("警告");
+            message.setContentText("请先进行全局设置！");
+            MFXNotificationSystem.instance().setPosition(NotificationPos.BOTTOM_RIGHT).publish(message);
+            return;
+        }
+
+        if (!validator.validate()) {
+            MessageNotification message = new MessageNotification();
+            message.setTitleText("警告");
+            message.setContentText("必填项不能为空！");
+            MFXNotificationSystem.instance().setPosition(NotificationPos.BOTTOM_RIGHT).publish(message);
+            return;
+        }
+
+        MFXProgressSpinner progressSpinner = new MFXProgressSpinner();
+        getBean(MainController.class).getRightContainer().getChildren().add(progressSpinner);
+
+        TaskUtil.simple(() -> {
+            GenerateConfig config = GenerateConfigMapper.INSTANCE.generateToEntity(formProperty);
+            codeTemplateGenerateManager.generate(generateType.get(), sysDataBaseConfigService.getSysDataBaseConfig(), config);
+            TimeUnit.SECONDS.sleep(3);
+            return 1;
+        }, e -> {
+            getBean(MainController.class).getRightContainer().getChildren().remove(progressSpinner);
+
+            MessageNotification message = new MessageNotification();
+            message.setTitleText("提示");
+            message.setContentText("生成完成！");
+            MFXNotificationSystem.instance().setPosition(NotificationPos.BOTTOM_RIGHT).publish(message);
+        });
+    }
+
+    public void clean() {
+        projectComboBox.setValue(null);
+        packageComboBox.setValue(null);
+        author.textProperty().setValue("");
+        tableNames.textProperty().setValue("");
     }
 
     @Data

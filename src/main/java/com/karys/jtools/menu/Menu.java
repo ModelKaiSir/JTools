@@ -8,4 +8,6 @@ public interface Menu extends Ordered {
     String getName();
 
     Parent getParent();
+
+    void clean();
 }

@@ -1,7 +1,6 @@
 package com.karys.jtools.views;
 
 import com.karys.jtools.controller.CodeGenerateController;
-import com.karys.jtools.controller.MenuController;
 import de.felixroske.jfxsupport.AbstractFxmlView;
 import de.felixroske.jfxsupport.FXMLView;
 import org.springframework.context.annotation.Scope;
